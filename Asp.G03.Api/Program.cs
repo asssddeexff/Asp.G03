@@ -1,9 +1,13 @@
 
 using Domain.Contracts;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Persistence.Data;
+using Service.Abstractions;
+using Services;
 
+using  AssemblyMappaing =  Services.AssemblyReference;
 namespace Asp.G03.Api
 {
     public class Program
@@ -31,6 +35,10 @@ namespace Asp.G03.Api
 
      );
             builder.Services.AddScoped<IDbInitializer, DbInitializer>();//Allow DI For DbInitializer
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddAutoMapper(typeof(AssemblyMappaing).Assembly);
+            builder.Services.AddScoped<IServiceManager, ServiceManager>();
+           
 
             var app = builder.Build();
 
