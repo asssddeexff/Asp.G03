@@ -57,6 +57,7 @@ namespace Asp.G03.Api
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseStaticFiles();
 
             app.UseHttpsRedirection();
 
