@@ -11,7 +11,7 @@ namespace Service.Abstractions
     {
         //Get All Product
         //Task<IEnumerable<ProductResultDto>> GetAllProductAsync(int? brandId, int? typeId, string? sort, int PageIndex = 1, int PageSize = 5);
-        Task<IEnumerable<ProductResultDto>> GetAllProductAsync(ProductSpecificationsParameters specsParams);
+        Task<PaginationResponse<ProductResultDto>> GetAllProductAsync(ProductSpecificationsParameters specsParams);
         //Get Product By Id
 
         Task<ProductResultDto?> GetProductByIdAsync(int id);
