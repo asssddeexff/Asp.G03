@@ -38,7 +38,7 @@ namespace Presentation
         public async Task <IActionResult> GetProductById(int id)
         {
           var result = await  serviceManager.ProductService.GetProductByIdAsync(id);
-            if(result is null) return NotFound();//404
+            //if(result is null) return NotFound();//404
 
             return Ok(result);
         }

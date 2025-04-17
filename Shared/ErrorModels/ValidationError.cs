@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Shared.ErrorModels
 {
-    public class ErrorDetails
+    public class ValidationError
     {
-        public int StatusCode { get; set; }
-        public string ErrorMessage { get; set; }
+        public string Field {  get; set; }
+        public IEnumerable<string> Errors { get; set; }
     }
 }

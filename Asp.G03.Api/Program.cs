@@ -1,12 +1,15 @@
 
+using Asp.G03.Api.MiddleWares;
 using Domain.Contracts;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Persistence.Data;
 using Service.Abstractions;
 using Services;
-
+using Shared.ErrorModels;
 using  AssemblyMappaing =  Services.AssemblyReference;
 namespace Asp.G03.Api
 {
@@ -38,7 +41,26 @@ namespace Asp.G03.Api
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddAutoMapper(typeof(AssemblyMappaing).Assembly);
             builder.Services.AddScoped<IServiceManager, ServiceManager>();
-           
+            builder.Services.Configure<ApiBehaviorOptions>(config =>
+            {
+                config.InvalidModelStateResponseFactory = (actionContext) =>
+                {
+                  var errors =  actionContext.ModelState.Where(m => m.Value.Errors.Any())
+                      .Select(m => new ValidationError()
+                      {
+                          Field = m.Key,
+                          Errors=m.Value.Errors.Select(errors => errors.ErrorMessage)
+                      });
+
+                    var response = new ValidationErrorResponse()
+                    {
+                        Errors = errors
+                    };
+                    return new BadRequestObjectResult(response);
+
+                };
+
+            } );
 
             var app = builder.Build();
 
@@ -50,6 +72,7 @@ namespace Asp.G03.Api
             await dbInitializer.InitializeAsync();
 
             #endregion
+            app.UseMiddleware<GlobalErrorHandlingMiddleware>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
