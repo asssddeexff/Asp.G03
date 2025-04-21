@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Data;
+using Persistence.identity;
 using Persistence.Repositiores;
 using StackExchange.Redis;
 
@@ -29,9 +30,21 @@ namespace Persistence
 
 
    );
+            services.AddDbContext<StoreIdentityDbContext>(Options =>
+            {
+
+                
+                Options.UseSqlServer(configuration.GetConnectionString("IdentityConnection"));
+
+            }
+
+
+  );
+
             services.AddScoped<IDbInitializer, DbInitializer>();//Allow DI For DbInitializer
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IBasketRepository, BasketRepository>();
+            services.AddScoped<ICacheRepository, CacheRepository>();
 
             services.AddSingleton<IConnectionMultiplexer>((serviceProvider) =>
             {

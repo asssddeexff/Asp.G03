@@ -4,6 +4,9 @@ using Persistence;
 using Shared.ErrorModels;
 using Asp.G03.Api.MiddleWares;
 using Domain.Contracts;
+using Domain.Models.identity;
+using Microsoft.AspNetCore.Identity;
+using Persistence.identity;
 namespace Asp.G03.Api.Extensions
 {
     public static class Extensions
@@ -20,6 +23,7 @@ namespace Asp.G03.Api.Extensions
 
 
          services.AddInfrastructureServices(configuration);
+            services.AddIdentityServices();
             services.AddApplicationServices();
             services.ConfigureServices();
 
@@ -35,6 +39,17 @@ namespace Asp.G03.Api.Extensions
 
 
             services.AddControllers();
+
+
+            return services;
+        }
+
+        private static IServiceCollection AddIdentityServices(this IServiceCollection services)
+        {
+
+
+            services.AddIdentity<AppUser,IdentityRole>()
+                .AddEntityFrameworkStores<StoreIdentityDbContext>();
 
 
             return services;
@@ -119,8 +134,8 @@ namespace Asp.G03.Api.Extensions
             using var scope = app.Services.CreateScope();
             var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>(); //Ask CLR Create Object From DbInitializer
             await dbInitializer.InitializeAsync();
+            await dbInitializer.InitializeIdentityAsync();
 
-      
 
             return app;
         }
