@@ -12,5 +12,6 @@ namespace Service.Abstractions
          IBasketService BasketService { get; }
 
         IChacheService chacheService { get; }
+        IAuthService AuthService { get; }   
     }
 }
