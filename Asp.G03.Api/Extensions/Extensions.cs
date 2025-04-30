@@ -7,6 +7,12 @@ using Domain.Contracts;
 using Domain.Models.identity;
 using Microsoft.AspNetCore.Identity;
 using Persistence.identity;
+using Microsoft.Extensions.Options;
+using Shared;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.Extensions.Configuration;
 namespace Asp.G03.Api.Extensions
 {
     public static class Extensions
@@ -24,10 +30,11 @@ namespace Asp.G03.Api.Extensions
 
          services.AddInfrastructureServices(configuration);
             services.AddIdentityServices();
-            services.AddApplicationServices();
+            services.AddApplicationServices(configuration);
             services.ConfigureServices();
+            services.ConfigureJwtServices(configuration);
 
-            
+
 
 
             return services;
@@ -39,6 +46,38 @@ namespace Asp.G03.Api.Extensions
 
 
             services.AddControllers();
+
+
+            return services;
+        }
+
+
+        private static IServiceCollection ConfigureJwtServices(this IServiceCollection services , IConfiguration configuration)
+        {
+
+
+            var JwtOptions = configuration.GetSection("jwtOptions").Get<JwtOptions>();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options => {
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidateLifetime = true,
+
+                    ValidIssuer = JwtOptions.Issuer,
+                    ValidAudience = JwtOptions.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtOptions.SecretKey))
+
+                };
+
+            });
+
 
 
             return services;
@@ -116,8 +155,8 @@ namespace Asp.G03.Api.Extensions
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 

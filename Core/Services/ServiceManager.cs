@@ -7,11 +7,14 @@ using AutoMapper;
 using Domain.Contracts;
 using Domain.Models.identity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Service.Abstractions;
+using Shared;
 
 namespace Services
 {
-    public class ServiceManager(IUnitOfWork unitOfWork , IMapper mapper,IBasketRepository basketRepository , ICacheRepository cacheRepository , UserManager<AppUser> userManager) : IServiceManager
+    public class ServiceManager(IUnitOfWork unitOfWork , IMapper mapper,IBasketRepository basketRepository , ICacheRepository cacheRepository , UserManager<AppUser> userManager, IOptions<JwtOptions> options) : IServiceManager
     {
         public IProductService ProductService { get; } = new ProductService(unitOfWork , mapper);
 
@@ -19,6 +22,6 @@ namespace Services
 
         public IChacheService chacheService { get; } = new CacheService(cacheRepository);
 
-        public IAuthService AuthService { get; } = new AuthService(userManager);
+        public IAuthService AuthService { get; } = new AuthService(userManager, options);
     }
 }
